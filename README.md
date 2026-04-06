@@ -1,2 +1,1 @@
-# terraform
-Deployments
+1 click deployments for wordpress
