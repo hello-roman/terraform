@@ -1,0 +1,43 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose
+  - git
+
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+
+  - mkdir -p /opt/chatfaq
+  - cd /opt/chatfaq
+
+  # Clone your chatFAQ repo
+  - git clone https://github.com/your-username/chatfaq.git .
+
+  # Create env file
+  - |
+    cat <<EOF > .env
+    DB_HOST=${DB_HOST}
+    DB_USER=${DB_USER}
+    DB_PASSWORD=${DB_PASSWORD}
+    OPENAI_API_KEY=${OPENAI_API_KEY}
+    EOF
+
+  # Docker compose
+  - |
+    cat <<EOF > docker-compose.yml
+    version: '3'
+    services:
+      app:
+        build: .
+        ports:
+          - "80:3000"
+        env_file:
+          - .env
+
+      redis:
+        image: redis:7
+    EOF
+
+  - docker-compose up -d --build
