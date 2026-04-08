@@ -1,1 +1,1 @@
-1 click deployments for wordpress
+1 click deployments on the cloud
