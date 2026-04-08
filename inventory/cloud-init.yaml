@@ -1,0 +1,29 @@
+#cloud-config
+package_update: true
+packages:
+  - docker.io
+  - docker-compose
+
+runcmd:
+  - systemctl enable docker
+  - systemctl start docker
+
+  - mkdir -p /opt/fleet
+  - cd /opt/fleet
+
+  - |
+    cat <<EOF > docker-compose.yml
+    version: '3'
+    services:
+      fleet:
+        image: fleetdm/fleet:latest
+        ports:
+          - "8080:8080"
+        environment:
+          - FLEET_MYSQL_ADDRESS=${DB_ENDPOINT}:3306
+          - FLEET_MYSQL_DATABASE=fleet
+          - FLEET_MYSQL_USERNAME=fleet
+          - FLEET_MYSQL_PASSWORD=${DB_PASSWORD}
+    EOF
+
+  - docker-compose up -d
